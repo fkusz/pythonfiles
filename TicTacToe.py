@@ -10,7 +10,7 @@ theBoard = {'a1': ' ' , 'a2': ' ' , 'a3': ' ' ,
 board_keys = ['b2','a1','a3','c1','c3','a2','b1','b3','c2']
 # for key in theBoard:
 #     board_keys.append(key)
-
+        
 def printBoard(board):
     print('\n')
     print('  1   2   3' )
@@ -40,62 +40,44 @@ def CheckTie(board):
         if board[key] == ' ':
             return False
     return True
-
-# Won't work for Alpha Beta Pruning
-# def minimax(board, depth, player):
-#     Scores = []
-#     Moves = validmoves(board, player)
-#     if depth == 0:
-#         return 0, None
-#     if CheckWin(board):
-#         return simplescore(board, switchplayers(player)), None
-#     for move in Moves:
-#         CopyBoard = board.copy()
-#         CopyBoard[move] = player
-#         Scores.append(minimax(CopyBoard, depth-1, switchplayers(player))[0])
-#     if player == 'X':
-#         Max = max(Scores)
-#         Move = Moves[Scores.index(Max)]
-#         return Max, Move
-#     else:
-#         Min = min(Scores)
-#         Move = Moves[Scores.index(Min)]
-#         return Min, Move
-
 ###############################################################################
-#Need to rewrite how it works for Alpha Beta Pruning. This is that attempt
 def minimax(board, depth, player):
-    Moves = validmoves(board, player)
-    if depth == 0:
-        return 0, None
+    Moves = validmoves(board)
+    length = len(Moves)
     if CheckWin(board):
-        return simplescore(board, switchplayers(player)), None
+        return depth+simplescore(board, switchplayers(player)), None
+    if length == 0 or depth == 0:
+        return 0-depth, None
     if player == 'X':
         Max = -100
         for move in Moves:
-            CopyBoard = board.copy()
-            CopyBoard[move] = player
-            Score = minimax(CopyBoard, depth-1, switchplayers(player))[0]
+            theBoard[move] = player
+            Score = minimax(theBoard, depth-1, switchplayers(player))[0]
+            theBoard[move] = ' '
             if Score > Max:
                 Max = Score
                 Move = move
+                if Max >= 20: #Pass a win straight up. Stop Searching.
+                    break
         return Max, Move
     else:
         Min = 100
         for move in Moves:
-            CopyBoard = board.copy()
-            CopyBoard[move] = player
-            Score = minimax(CopyBoard, depth-1, switchplayers(player))[0]
+            theBoard[move] = player
+            Score = minimax(theBoard, depth-1, switchplayers(player))[0]
+            theBoard[move] = ' '
             if Score < Min:
                 Min = Score
                 Move = move
+                if Min <= -10: #Pass a loss straight up. Stop Searching.
+                    break
         return Min, Move
-###############################################################################
+###############################################################################  
 def simplescore(board, player):
     return 20 if player == 'X' else -20
 def switchplayers(player):
     return 'O' if player == 'X' else 'X'    
-def validmoves(board, player):
+def validmoves(board):
     validmoves = []
     for key in board_keys:
         if board[key] == ' ':
@@ -128,12 +110,14 @@ def game():
                 continue
         else:
             Start = datetime.now()
-            score, bestmove = minimax(theBoard,9-count,turn)
+            score, bestmove = minimax(theBoard,9,turn)
             Stop = datetime.now()
+            print(score)
             print(Stop-Start)
             theBoard[bestmove] = turn
             print("The AI moves to " + bestmove)
             count += 1
+            
         # Now we will check if player X or O has won,for every move after 5 moves. 
         if count >= 5:
             if CheckWin(theBoard):

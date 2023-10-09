@@ -1,6 +1,5 @@
 import math
 import matplotlib.pyplot as plt
-import numpy as np
 t = 1
 end = 365
 I = 1
