@@ -20,5 +20,4 @@ class Counter:
         
 root = tk.Tk()
 counter = Counter(root,60)
-counter2 = Counter(root,7.25)
 root.mainloop()
